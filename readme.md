@@ -2,7 +2,7 @@
 
 ##Homework
 
-See the session-4-work repo readme.
+See session-4-homework repo.
 
 ##CRUD (continued)
 
