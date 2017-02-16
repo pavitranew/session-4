@@ -1,5 +1,9 @@
 #Session 4b
 
+##Homework
+
+See the session-4-work repo readme.
+
 ##CRUD (continued)
 
 cd into the working directory and npm install all dependencies.
