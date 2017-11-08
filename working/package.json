@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch-node-sass": "node-sass --watch scss/styles.scss --output public/css/  --source-map true",
-    "start": "browser-sync start --browser \"google chrome\" --server 'public' --files 'public'",
+    "watch-node-sass": "node-sass --watch \"scss/styles.scss\" --output \"public/css/\"  --source-map true",
+    "start": "browser-sync start --browser \"google chrome\" --server \"public\" --files \"public\"",
     "boom!": "concurrently \"npm run start\" \"npm run watch-node-sass\" "
   },
   "author": "",

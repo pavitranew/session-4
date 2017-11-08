@@ -1,16 +1,14 @@
-#Session 4b
+# Session 4b
 
-##Homework
+## Homework
 
 See session-4-homework repo.
 
-##CRUD (continued)
+## CRUD (continued)
 
-cd into the working directory and npm install all dependencies.
-
-Review the connection settings.
-
-Log into mLab.com and find your database and database user.
+* cd into the working directory and npm install all dependencies.
+* review the connection settings.
+* log into mLab.com and find your database and database user.
 
 Add a variable with the db username and password in the connection URL 
 
@@ -24,7 +22,7 @@ MongoClient.connect(mongoUrl, (err, database) => {...}
 
 Run `nodemon app.js`
 
-####Showing entries to users
+#### Showing entries to users
 
 To show the entries stored in MongoLab:
 
