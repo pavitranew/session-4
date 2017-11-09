@@ -2,11 +2,11 @@
 
 ## Homework
 
-See session-4-homework repo.
+Complete the Express application so that each navigation item works (i.e. displays relevant content in the browser)
 
 ## CRUD (continued)
 
-* cd into the working directory and npm install all dependencies.
+* cd into the `working` directory and npm install all dependencies.
 * review the connection settings.
 * log into mLab.com and find your database and database user.
 
