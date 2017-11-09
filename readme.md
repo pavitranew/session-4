@@ -4,25 +4,33 @@
 
 Complete the Express application so that each navigation item works (i.e. displays relevant content in the browser)
 
-## CRUD (continued)
+## Set up and Db Connection
 
-* cd into the `working` directory and npm install all dependencies.
-* review the connection settings.
-* log into mLab.com and find your database and database user.
+Review the package.json. Note the use of a proxy for browser sync and separate mac and pc scripts.
 
-Add a variable with the db username and password in the connection URL 
+* cd into the `working` directory 
+* npm install all dependencies
+* review the connection settings in app.js
+* log into / create an account on mLab.com
+* find / create your database and database user
+
+Note the instructions for connecting with the db username and password in the connection URL 
+
+`mongodb://<dbuser>:<dbpassword>@ds139969.mlab.com:39969/bcl`
+
+e.g.:
 
 `const mongoUrl = 'mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl'` 
 
-(Replace it with your own.)
+(You will replace it with your own later in class.)
 
 ```
 MongoClient.connect(mongoUrl, (err, database) => {...}
 ```
 
-Run `nodemon app.js`
+Run `npm run <boom-mac or pc>` or simply `nodemon app.js`
 
-#### Showing entries to users
+### Showing entries to users
 
 To show the entries stored in MongoLab:
 
