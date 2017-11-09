@@ -36,6 +36,75 @@ Run `npm run <boom-mac or pc>` or simply `nodemon app.js` (demo - app.use static
 
 Review app.js.
 
+```js
+app.get('/', (req, res) => {
+  console.log('hey')
+  db.collection('entries').find().toArray((err, result) => {
+    if (err) return console.log(err)
+    // renders index.ejs
+    // res.render('index.ejs', {entries: result})
+    res.send('it works!')
+  })
+})
+```
+
+```js
+app.get('/', (req, res) => {
+  db.collection('entries').find().toArray((err, result) => {
+    if (err) return console.log(err)
+    // renders index.ejs
+    // res.render('index.ejs', {entries: result})
+    const foo = { name: 'daniel', age: 100, bar: true }
+    res.json(foo)
+  })
+})
+```
+
+Get params from the location string:
+
+`http://localhost:9001/?name=daniel&foo=true`
+
+```js
+app.get('/', (req, res) => {
+  db.collection('entries').find().toArray((err, result) => {
+    if (err) return console.log(err)
+    // renders index.ejs
+    // res.render('index.ejs', {entries: result})
+    res.send(req.query.name)
+  })
+})
+```
+
+Can also send the query directly to json:
+
+`res.json(req.query)`
+
+In our current template we have:
+
+`app.use(bodyParser.urlencoded({extended: true}))`
+
+Which encodes data for us so we can use things like `req.body`.
+
+## Variables in a route
+
+```js
+app.get('/rewind/:animal', (req, res) => {
+  res.send('yeah')
+  // res.send(req.params.animal)
+  })
+```
+
+```js
+app.get('/rewind/:animal', (req, res) => {
+  const rewinder = [...req.params.animal].reverse().join('')
+  res.send(rewinder)
+  })
+```
+
+You should review some of the [documentation for express](http://expressjs.com/en/api.html#express).
+
+### Showing Entries
+
 To show the entries stored in MongoLab:
 
 1. Get entries from MongoLab
