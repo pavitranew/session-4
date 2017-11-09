@@ -28,7 +28,7 @@ e.g.:
 MongoClient.connect(mongoUrl, (err, database) => {...}
 ```
 
-Run `npm run <boom-mac or pc>` or simply `nodemon app.js`
+Run `npm run <boom-mac or pc>` or simply `nodemon app.js` (demo - app.use static).
 
 ### Showing entries to users
 
