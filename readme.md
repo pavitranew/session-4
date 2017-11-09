@@ -27,10 +27,11 @@ Run `nodemon app.js`
 To show the entries stored in MongoLab:
 
 1. Get entries from MongoLab
-
-2. Use Javascript to display the entries
+1. Use Javascript to display the entries
 
 We can get the entries from MongoLab by using the find method that’s available in the [collection method](https://docs.mongodb.com/manual/reference/method/js-collection/).
+
+Edit the primary route:
 
 ```js
 app.get('/', (req, res) => {
@@ -40,11 +41,11 @@ app.get('/', (req, res) => {
 })
 ```
 
-The find method returns a cursor (a complex Mongo Object that probably doesn’t make much sense).
+The find method returns a cursor. (You will see it in the terminal, a complex Mongo Object that probably won't make much sense.)
 
 This cursor object contains all entries from our database. It also contains a [bunch of other properties and methods](https://docs.mongodb.com/manual/reference/method/js-cursor/) that allow us to work with data easily. One method is the toArray method.
 
-The `toArray` method takes callback function that allows us to perform actions on the entries we retrieved from MongoLab. Try doing a console.log() for the results and see what we get:
+The `toArray` method takes a callback function that allows us to perform actions on the entries we retrieved from MongoLab. Try doing a console.log() for the results and see what we get:
 
 
 ```js
@@ -58,7 +59,11 @@ app.get('/', (req, res) => {
 
 The array of entries should appear in the terminal. 
 
-####Generate HTML to contain the entries
+Other pertinent methods here include the `.find()` method. It is run against a collection and is just one of a [series of methods](https://docs.mongodb.com/manual/reference/method/js-collection/).
+
+We are also using the `connect()` method which is documented [here](https://docs.mongodb.com/manual/reference/method/connect/)
+
+#### Generate HTML to contain the entries
 
 The standard method for outputting content fetched from a database is to use a templating engine. Some popular template engines include Jade/pug, [Moustache](https://mustache.github.io/#demo), Embedded JavaScript [(ejs)](http://www.embeddedjs.com) and Nunjucks. React and Angular offer their own templating engines - but to conclude this exercise we will use Embedded JavaScript (ejs). It’s the easiest to implement.
 
@@ -66,20 +71,20 @@ We use ejs by first installing it and then setting the view engine in Express to
 
 `$ npm install ejs --save`
 
-and in app.js:
+and in app.js we add:
 
 `app.set('view engine', 'ejs')`
 
 Let’s first create an index.ejs file within a views folder so we can start populating data.
 
-```
-mkdir views
-touch views/index.ejs
+```bash
+$ mkdir views
+$ touch views/index.ejs
 ```
 
 Now, copy the contents of index.html into index.ejs and add.
 
-```
+```html
 <% for(var i=0; i<entries.length; i++) { %>
 <div class="entry">
   <h2><%= entries[i].label %></h2>
@@ -90,7 +95,7 @@ Now, copy the contents of index.html into index.ejs and add.
 
 In EJS, you can write JavaScript within <% and %> tags. You can also output JavaScript as strings with the <%= and %> tags.
 
-```
+```css
 .entry {
   background: #eee;
   padding: 0.5rem;
@@ -101,7 +106,7 @@ We’re basically going to loop through the entries array and create strings wit
 
 The complete index.ejs file so far should be:
 
-```
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -153,19 +158,17 @@ app.get('/', (req, res) => {
 
 Now, refresh your browser and you should be able to see all entries.
 
-##Integration with the old site
+## Integration with the old site
 
-We need to 
+We need to:
 
 1. edit our npm scripts to integrate nodemon
-
-2. move the old index.html into index.ejs 
-
-3. re-enable app.use static. 
+1. move the old index.html into index.ejs 
+1. re-enable app.use static. 
 
 Edit package.json to proxy the browser sync to our express port number and add nodemon to our list of currently running scripts.
 
-```
+```js
  "scripts": {
     "watch-node-sass": "node-sass --watch scss/styles.scss --output public/css/  --source-map true",
     "start": "browser-sync start --proxy 'localhost:9000' --browser \"google chrome\"  --files 'public'",
@@ -175,7 +178,7 @@ Edit package.json to proxy the browser sync to our express port number and add n
 
 Migrate index.html into index.ejs something like the below:
 
-```
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>

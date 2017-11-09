@@ -2,13 +2,13 @@ const express = require('express')
 const bodyParser = require('body-parser') 
 const MongoClient = require('mongodb').MongoClient
 const app = express() 
-const port = 9000
+const port = 9005
 
 // EXPRESS STATIC FILES
 // app.use(express.static('public'))
 
 app.use(bodyParser.urlencoded({extended: true}))
-
+app.set('view engine', 'pug')
 
 MongoClient.connect('mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl', (err, database) => {
    if (err) return console.log(err)
@@ -18,8 +18,14 @@ MongoClient.connect('mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl', 
   })
 })
 
+
+
 app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/index.html')
+  db.collection('entries').find().toArray((err, result) => {
+    if (err) return console.log(err)
+    // renders index.ejs
+    res.render('index.pug', {entries: result})
+  })
 })
 
 // EXAMPLE - VIEW FORM CONTENTS (object) IN THE REQUEST BODY
