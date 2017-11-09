@@ -1,4 +1,4 @@
-# Session 4b
+# 4b Express and Templating
 
 ## Homework
 
@@ -260,6 +260,8 @@ Let's look at using an older (but still quite common and actively maintained) ve
 
 In the terminal, cd into the angular folder and set it up with npm install and run boom!
 
+Add a link to Angular in the head of index.html:
+
 `<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
 
 HTML5 introduced the `data-` [attribute](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes).
@@ -272,13 +274,16 @@ In navItems:
 
 `var app = angular.module('myApp', []);`
 
-App is the main Angular space and can be broken down into multiple controllers.
+`app` is the main Angular space and can be broken down into multiple controllers.
 
 `<body data-ng-controller="NavController">`
 
 ```
 app.controller("NavController", function( $scope ) {
   $scope.navItems = [
+  🔥
+  ]
+  })
 ```
 
 [Scope](https://docs.angularjs.org/guide/scope#!) is the glue between application controller and the view.
@@ -286,14 +291,14 @@ app.controller("NavController", function( $scope ) {
 Comment out the navItems build script in main.js
 
 ```
-const markup =
+//const markup =
 //   `<ul>
 //     ${navItems.map(listItem => `<li><a href="${listItem.link}">${listItem.label}</a></li>`).join('')}
 //   </ul>`;
 // navLinks.innerHTML = markup;
 ```
 
-Use Angular to build it out again:
+Use Angular to build it out again in index.html:
 
 ```
 <nav id="main">
@@ -319,11 +324,9 @@ Build out the content:
 </div>
 ```
 
-Note - injecting html into a page is considered unsafe. Try adding `{{ navItem.content }}`
+Note - injecting html into a page is considered unsafe. 
 
-We could use:
-
-`<div ng-bind-html="navItem.content"></div>``
+Try adding `{{ navItem.content }}`
 
 Load [sanitize](https://docs.angularjs.org/api/ngSanitize):
 
@@ -333,7 +336,11 @@ Use [injection](https://docs.angularjs.org/guide/di) to make it available to the
 
 `var app = angular.module('myApp', ['ngSanitize']);`
 
-###Details, details
+We can then use:
+
+`<div ng-bind-html="navItem.content"></div>`
+
+### Angular Directives
 
 Simple Angular directives:
 
@@ -353,7 +360,7 @@ This is a demonstration of [data binding](https://docs.angularjs.org/guide/datab
 
 Add the data to our controller - `$scope.messageText = 'Hello World!'`
 
-and it is still available in our view:
+remove the ng-init from the div. It is still available in our view:
 
 ```
 <div class="site-wrap">
@@ -422,7 +429,7 @@ keys and values of the array:
 </ul>
 ```
 
-##Components
+## Components
 
 test.js
 
@@ -462,7 +469,7 @@ test.html
 ```
 
 
-###Notes
+### Notes
 
 https://github.com/expressjs/body-parser#bodyparserurlencodedoptions
 

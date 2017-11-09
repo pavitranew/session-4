@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ng-app="myApp">
 <head>
 	<head>
 		<meta charset="UTF-8">
 		<title>Ang Barclays Live</title>
+		<script src="https://code.angularjs.org/1.5.8/angular.min.js"></script>
+		<script src="https://code.angularjs.org/1.5.8/angular-sanitize.min.js"></script>
 		<script src="/js/navitems.js"></script>
 		<link rel="stylesheet" href="/css/styles.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	</head>
 
-	<body>
+	<body ng-controller="MyAppController">
 
 		<header>
 			<h1>Not on the app store!</h1>
@@ -18,10 +20,22 @@
 		<nav id="main">
 			<a class="logo" href="#0"><img src="/img/logo.svg" /></a>
 			<ul id="nav-links">
+				<li data-ng-repeat="navItem in navItems">
+					<a href={{navItem.link}}>{{navItem.label}}</a>
+				</li>
 			</ul>
 		</nav>
 
 		<div class="site-wrap">
+
+			<input ng-model="messageText" size="30"/>
+			<p>Everybody shout "{{ messageText | uppercase }}"</p>
+
+			<div ng-repeat="navItem in navItems">
+				<h2>{{ navItem.label }}</h2>
+				<h3>{{ navItem.header }}</h3>
+				<div ng-bind-html="navItem.content"></div>
+			</div>
 
 			<form action="/entries" method="POST">
 				<input type="text" placeholder="label" name="label">
