@@ -344,6 +344,39 @@ const markup = `${navItems.map(listItem => `<li><a href="${listItem.link}">${lis
 
 Now, create your own db on mLab and, using your own connection, make the interface work with your own content.
 
+### Nav - an blunt approach
+
+```js
+app.get('/', (req, res) => {
+  db.collection('entries').find().toArray((err, result) => {
+    if (err) return console.log(err)
+    // renders index.ejs
+    res.render('index.ejs', {entries: result, nav: ['Watchlist', 'Research', 'Markets']})
+  })
+})
+```
+
+```html
+<nav>
+  <% for(var i=0; i<nav.length; i++) { %>
+  <li>
+    <a href="#"><%= nav[i] %></a>
+  </li>
+  <% } %>
+</nav>
+```
+
+```js
+app.get('/:name?', (req, res) => {
+  let name = req.params.name
+  db.collection('entries').find({
+    "label": name
+  }).toArray((err, result) => {
+    res.render('index.ejs', {entries: result, nav: ['watchlist', 'research', 'markets']})
+  })
+})
+```
+
 
 ## Angular as a Templating Engine
 
