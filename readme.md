@@ -28,9 +28,13 @@ e.g.:
 MongoClient.connect(mongoUrl, (err, database) => {...}
 ```
 
+We can also download a GUI for Mongo called Compass at https://www.mongodb.com/download-center#compass
+
 Run `npm run <boom-mac or pc>` or simply `nodemon app.js` (demo - app.use static).
 
 ### Showing entries to users
+
+Review app.js.
 
 To show the entries stored in MongoLab:
 
@@ -43,17 +47,17 @@ Edit the primary route:
 
 ```js
 app.get('/', (req, res) => {
-  var cursor = db.collection('entries').find()
+  let cursor = db.collection('entries').find()
   console.log(cursor)
   res.sendFile(__dirname + '/index.html')
 })
 ```
 
-The find method returns a cursor. (You will see it in the terminal, a complex Mongo Object that probably won't make much sense.)
+The find method returns a cursor. You will see it's contents in the terminal if you refresh the page, a complex Mongo Object.
 
-This cursor object contains all entries from our database. It also contains a [bunch of other properties and methods](https://docs.mongodb.com/manual/reference/method/js-cursor/) that allow us to work with data easily. One method is the toArray method.
+This cursor object contains all entries from our database. It also contains a [bunch of other properties and methods](https://docs.mongodb.com/manual/reference/method/js-cursor/) that allow us to work with data more easily. One method is the [toArray](https://docs.mongodb.com/manual/reference/method/cursor.toArray/) method.
 
-The `toArray` method takes a callback function that allows us to perform actions on the entries we retrieved from MongoLab. Try doing a console.log() for the results and see what we get:
+The `toArray` method takes a callback function that allows us to perform actions on the entries we retrieved from MongoLab. Try doing a console.log() for the results and see the results in the console:
 
 
 ```js
@@ -65,7 +69,7 @@ app.get('/', (req, res) => {
 })
 ```
 
-The array of entries should appear in the terminal. 
+The array of entries should appear in the terminal on refresh. 
 
 Other pertinent methods here include the `.find()` method. It is run against a collection and is just one of a [series of methods](https://docs.mongodb.com/manual/reference/method/js-collection/).
 
@@ -83,7 +87,7 @@ and in app.js we add:
 
 `app.set('view engine', 'ejs')`
 
-Let’s first create an index.ejs file within a views folder so we can start populating data.
+Let’s first create an `index.ejs` file within a `views` folder so we can start populating data.
 
 ```bash
 $ mkdir views
@@ -103,14 +107,16 @@ Now, copy the contents of index.html into index.ejs and add.
 
 In EJS, you can write JavaScript within <% and %> tags. You can also output JavaScript as strings with the <%= and %> tags.
 
+We’re going to loop through the entries array and create strings with `entries[i].label` and `entries[i].content`.
+
+Add a touch of css:
+
 ```css
 .entry {
   background: #eee;
   padding: 0.5rem;
 }
 ```
-
-We’re basically going to loop through the entries array and create strings with `entries[i].label` and `entries[i].content`.
 
 The complete index.ejs file so far should be:
 
@@ -164,13 +170,13 @@ app.get('/', (req, res) => {
 })
 ```
 
-Now, refresh your browser and you should be able to see all entries.
+Refresh your browser and you should be able to see all entries.
 
 ## Integration with the old site
 
 We need to:
 
-1. edit our npm scripts to integrate nodemon
+1. check our npm scripts to integrate nodemon and proxy browser-sync
 1. move the old index.html into index.ejs 
 1. re-enable app.use static. 
 
@@ -242,7 +248,7 @@ Change the name of index.html to something else.
 
 Enable use.static in app.js, rename /public/index.html (otherwise express will serve it instead of index.ejs), halt nodemon, and run:
 
-`npm run boom!`
+`npm run <script>`
 
 Get one entry using parameters:
 
@@ -259,14 +265,22 @@ app.get('/:name?', (req, res) => {
 
 Try: `http://localhost:3000/watchlist`
 
-Edit main.js to remove onload and hashchange events and main.js to remove the hashes.
+Edit main.js to remove onload and remove the hashes form markup:
+
+```
+const markup = `${navItems.map(listItem => `<li><a href="${listItem.link}">${listItem.label}</a></li>`).join('')}`;
+
+// window.location.hash = '#watchlist'
+```
+
+Now, create your own db on mLab and, using your own connection, make the interface work with your own content.
 
 
 ## Angular as a Templating Engine
 
 Let's look at using an older (but still quite common and actively maintained) version of Angular as our page templating language.
 
-In the terminal, cd into the angular folder and set it up with npm install and run boom!
+In the terminal, cd into the angular folder and set it up with npm install and run `nodemon app.js`
 
 Add a link to Angular in the head of index.html:
 
@@ -276,22 +290,182 @@ HTML5 introduced the `data-` [attribute](https://developer.mozilla.org/en-US/doc
 
 Angular uses this concept to extend html with [directives](https://www.w3schools.com/angular/angular_directives.asp) such as data-ng-app, data-ng-controller, data-ng-repeat
 
-`<html lang="en"  data-ng-app="myApp">`
+`<html lang="en"  data-ng-app>`
+
+
+
+### Angular Directives
+
+Simple Angular directives:
+
+1. ng-app − This directive starts an AngularJS Application. We use it to create [Modules](https://docs.angularjs.org/guide/module)
+2. ng-init − This directive initializes application data. (We won't use it except for the simple examples below.)
+3. ng-model − This directive defines the model that is variable to be used in AngularJS.
+4. ng-repeat − This directive repeats html elements for each item in a collection.
+
+```html
+<div class="site-wrap"  ng-init="messageText = 'Hello World!'">
+
+<input ng-model="messageText" size="30"/>
+<p>Everybody shout "{{ messageText | uppercase }}"</p>
+```
+
+This is a demonstration of [data binding](https://docs.angularjs.org/guide/databinding) and [filtering](https://docs.angularjs.org/api/ng/filter) to uppercase.
+
+Alernates 1 - using an object
+
+`ng-init="greeting = { greeter: 'Daniel' , message: 'Hello World' }"`
+
+```html
+<input type="text" ng-model="greeting.greeter" size="30"/>
+<input type="text" ng-model="greeting.message" size="30"/>
+{{greeting.greeter }} says "{{ greeting.message }}"
+```
+
+Alternates 2 - using ng-repeat with an array
+
+```html
+<div class="site-wrap" ng-init="portfolios = ['Call of Booty', 'The Sack of the Innocents', 'Pipe and First Mate']" >
+
+<ul>
+  <li ng-repeat="portfolio in portfolios">
+    {{ portfolio }}
+  </li>
+</ul>
+```
+
+Alernate 3 - [filtering](https://docs.angularjs.org/api/ng/filter) and ordering on an array of objects
+
+```html
+<div class="site-wrap" ng-init="portfolios = [
+{ name: 'Call of Booty', date: '2013-09-01' },
+{ name: 'The Sack of the Innocents', date: '2014-04-15' },
+{ name: 'Pipe and First Mate', date: '2012-10-01' } ]">
+
+<p>Filter list: <input ng-model="searchFor" size="30"/></p>
+
+<ul>
+  <li ng-repeat="portfolio in portfolios | filter:searchFor | orderBy:'date' ">
+  {{ portfolio.name  }}</li>
+</ul>
+```
+
+ngClass:
+
+```html
+<ul>
+  <li ng-repeat="portfolio in portfolios |
+  filter:searchFor |
+  orderBy:'date'"
+  ng-class="{ even: $even, odd: $odd }">
+  {{ portfolio.name  }}</li>
+</ul>
+```
+
+with:
+
+```html
+<style>
+  .even { color: red; }
+  .odd { color: blue; }
+</style>
+```
+
+keys and values of the array:
+
+```html
+<ul>
+  <li ng-repeat="(key, value) in portfolios">
+      <strong>{{key}}</strong> - {{value}}
+  </li>
+</ul>
+```
+
+## Components
+
+Create: `test.js`:
+
+```js
+angular.module('myApp', []);
+
+angular.module('myApp').component('greetUser', {
+    template: 'Hello, {{$ctrl.user}}!',
+    controller: function GreetUserController() {
+        this.user = 'world';
+    }
+});
+```
+
+Create `test.html`:
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>AngularJS Module</title>
+  <script src="https://code.angularjs.org/1.5.8/angular.js"></script>
+  <script src="test.js"></script>
+</head>
+
+<body>
+
+  <div ng-app="myApp">
+    <greet-user></greet-user>
+  </div>
+
+</body>
+
+</html>
+```
+
+## PROCESS
+
+Declare a named Angular app:
+
+`<html lang="en"  ng-app="myApp">`
+
+Place a section of the page under the influence of an Angular controller:
+
+`<body data-ng-controller="NavController">`
 
 In navItems:
+
+Declare app to be an instance of an Angular module:
 
 `var app = angular.module('myApp', []);`
 
 `app` is the main Angular space and can be broken down into multiple controllers.
 
-`<body data-ng-controller="NavController">`
+Add our data to the NavController (in navItems.js):
 
-```
+```js
 app.controller("NavController", function( $scope ) {
   $scope.navItems = [
   🔥
   ]
   })
+```
+
+Add the data to our controller - `$scope.messageText = 'Hello World!'`:
+
+```js
+app.controller("NavController", function( $scope ) {
+  $scope.messageText = 'Hello World!'
+  $scope.navItems = [
+  🔥
+  ]
+  })
+```
+
+It is still available in our view:
+
+```html
+<div class="site-wrap">
+
+<input ng-model="messageText" size="30"/>
+<p>Everybody shout "{{ messageText | uppercase }}"</p>
 ```
 
 [Scope](https://docs.angularjs.org/guide/scope#!) is the glue between application controller and the view.
@@ -325,7 +499,7 @@ Use Angular to build it out again in index.html:
 
 Build out the content:
 
-```
+```html
 <div ng-repeat="navItem in navItems">
   <h2>{{ navItem.label }}</h2>
   <h3>{{ navItem.header }}</h3>
@@ -347,134 +521,6 @@ Use [injection](https://docs.angularjs.org/guide/di) to make it available to the
 We can then use:
 
 `<div ng-bind-html="navItem.content"></div>`
-
-### Angular Directives
-
-Simple Angular directives:
-
-1. ng-app − This directive starts an AngularJS Application. We use it to create [Modules](https://docs.angularjs.org/guide/module)
-2. ng-init − This directive initializes application data. (We won't use it except for the simple examples below.)
-3. ng-model − This directive defines the model that is variable to be used in AngularJS.
-4. ng-repeat − This directive repeats html elements for each item in a collection.
-
-```
-<div class="site-wrap"  ng-init="messageText = 'Hello World!'">
-
-<input ng-model="messageText" size="30"/>
-<p>Everybody shout "{{ messageText | uppercase }}"</p>
-```
-
-This is a demonstration of [data binding](https://docs.angularjs.org/guide/databinding) and [filtering](https://docs.angularjs.org/api/ng/filter) to uppercase.
-
-Add the data to our controller - `$scope.messageText = 'Hello World!'`
-
-remove the ng-init from the div. It is still available in our view:
-
-```
-<div class="site-wrap">
-
-<input ng-model="messageText" size="30"/>
-<p>Everybody shout "{{ messageText | uppercase }}"</p>
-```
-
-Alernates 1 - using an object
-
-`ng-init="greeting = { greeter: 'Daniel' , message: 'Hello World' }"`
-
-```
-<input type="text" ng-model="greeting.greeter" size="30"/>
-<input type="text" ng-model="greeting.message" size="30"/>
-{{greeting.greeter }} says "{{ greeting.message }}"
-```
-
-Alternates 2 - using ng-repeat with an array
-
-```
-<div class="site-wrap" ng-init="portfolios = ['Call of Booty', 'The Sack of the Innocents', 'Pipe and First Mate']" >
-
-<ul>
-  <li ng-repeat="portfolio in portfolios">
-    {{ portfolio }}
-  </li>
-</ul>
-```
-
-Alernate 3 - [filtering](https://docs.angularjs.org/api/ng/filter) and ordering on an array of objects
-
-```
-<div class="site-wrap" ng-init="portfolios = [
-{ name: 'Call of Booty', date: '2013-09-01' },
-{ name: 'The Sack of the Innocents', date: '2014-04-15' },
-{ name: 'Pipe and First Mate', date: '2012-10-01' } ]">
-
-<p>Filter list: <input ng-model="searchFor" size="30"/></p>
-
-<ul>
-  <li ng-repeat="portfolio in portfolios | filter:searchFor | orderBy:'date' ">
-  {{ portfolio.name  }}</li>
-</ul>
-```
-
-ngClass:
-
-```
-<ul>
-  <li ng-repeat="portfolio in portfolios |
-  filter:searchFor |
-  orderBy:'date'"
-  ng-class="{ even: $even, odd: $odd }">
-  {{ portfolio.name  }}</li>
-</ul>
-```
-
-keys and values of the array:
-
-```
-<ul>
-  <li ng-repeat="(key, value) in portfolios">
-      <strong>{{key}}</strong> - {{value}}
-  </li>
-</ul>
-```
-
-## Components
-
-test.js
-
-```
-angular.module('myApp', []);
-
-angular.module('myApp').component('greetUser', {
-    template: 'Hello, {{$ctrl.user}}!',
-    controller: function GreetUserController() {
-        this.user = 'world';
-    }
-});
-```
-
-test.html
-
-```
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="utf-8" />
-  <title>AngularJS Module</title>
-  <script src="https://code.angularjs.org/1.5.8/angular.js"></script>
-  <script src="test.js"></script>
-</head>
-
-<body>
-
-  <div ng-app="myApp">
-    <greet-user></greet-user>
-  </div>
-
-</body>
-
-</html>
-```
 
 
 ### Notes
