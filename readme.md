@@ -238,7 +238,7 @@ Enable use.static in app.js, rename /public/index.html (otherwise express will s
 
 Get one entry using parameters:
 
-```
+```js
 app.get('/:name?', (req, res) => {
   let name = req.params.name
   db.collection('entries').find({
@@ -254,9 +254,11 @@ Try: `http://localhost:3000/watchlist`
 Edit main.js to remove onload and hashchange events and main.js to remove the hashes.
 
 
-##Angular as a Templating Engine
+## Angular as a Templating Engine
 
-Set up `angular` folder with npm install and boom!
+Let's look at using an older (but still quite common and actively maintained) version of Angular as our page templating language.
+
+In the terminal, cd into the angular folder and set it up with npm install and run boom!
 
 `<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
 

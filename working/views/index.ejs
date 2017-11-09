@@ -1,36 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Test</title>
-	<style>
-	input, textarea {
-		display: block;
-		margin: 1rem;
-		width: 70%;
-	}
-	.entry {
-		background: #eee;
-		padding: 0.5rem;
-	}
-</style>
-</head>
-<body>
-	<p>Testing 1 2 3</p>
+	<head>
+		<meta charset="UTF-8">
+		<title>EJS Barclays Live</title>
+		<link rel="stylesheet" href="/css/styles.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<form action="/entries" method="POST">
-		<input type="text" placeholder="label" name="label">
-		<input type="text" placeholder="header" name="header">
-		<textarea type="text" placeholder="content" name="content"></textarea>
-		<button type="submit">Submit</button>
-	</form>
+		<style>
+			input, textarea {
+				display: block;
+				margin: 1rem;
+				width: 70%;
+			}
+			.entry {
+				background: #eee;
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>Not on the app store!</h1>
+		</header>
 
-	<% for(var i=0; i<entries.length; i++) { %>
-	<div class="entry">
-		<h2><%= entries[i].label %></h2>
-		<p><%= entries[i].content %></p>
-	</div>
-	<% } %>
+		<nav id="main">
+			<a class="logo" href="#0"><img src="/img/logo.svg" /></a>
+			<ul id="nav-links"></ul>
+		</nav>
 
-</body>
+		<div class="site-wrap">
+			<% for(var i=0; i<entries.length; i++) { %>
+			<div class="entry">
+				<h2><%= entries[i].label %></h2>
+				<p><%= entries[i].content %></p>
+			</div>
+			<% } %>
+
+			<form action="/entries" method="POST">
+				<input type="text" placeholder="label" name="label">
+				<input type="text" placeholder="header" name="header">
+				<textarea type="text" placeholder="content" name="content"></textarea>
+				<button type="submit">Submit</button>
+			</form>
+		</div>
+		<script src="/js/navitems.js"></script>
+		<script src="/js/main.js"></script>
+	</body>
 </html>

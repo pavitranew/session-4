@@ -5,10 +5,10 @@ const app = express()
 const port = 9005
 
 // EXPRESS STATIC FILES
-// app.use(express.static('public'))
+app.use(express.static('public'))
 
 app.use(bodyParser.urlencoded({extended: true}))
-app.set('view engine', 'pug')
+app.set('view engine', 'ejs')
 
 MongoClient.connect('mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl', (err, database) => {
    if (err) return console.log(err)
@@ -20,11 +20,12 @@ MongoClient.connect('mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl', 
 
 
 
-app.get('/', (req, res) => {
-  db.collection('entries').find().toArray((err, result) => {
-    if (err) return console.log(err)
-    // renders index.ejs
-    res.render('index.pug', {entries: result})
+app.get('/:name?', (req, res) => {
+  let name = req.params.name
+  db.collection('entries').find({
+    "label": name
+  }).toArray((err, result) => {
+    res.render('index.ejs', {entries: result})
   })
 })
 
