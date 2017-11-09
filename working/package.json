@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start-mac": "browser-sync start --proxy 'localhost:9000' --browser 'google chrome' --files 'app'",
+    "start-mac": "browser-sync start --proxy 'localhost:9000' --browser 'google chrome' --files 'public'",
     "start-pc": "browser-sync start --proxy \"localhost:9000\" --browser \"chrome.exe\" --files \"public\"",
     "boom-mac": "concurrently 'nodemon app.js' 'npm run start-mac' ",
     "boom-pc": "concurrently \"nodemon app.js\" \"npm run start-pc\" "
