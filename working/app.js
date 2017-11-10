@@ -5,22 +5,41 @@ const app = express()
 const port = 9000
 
 // EXPRESS STATIC FILES
-// app.use(express.static('public'))
+app.use(express.static('public'))
 
 app.use(bodyParser.urlencoded({extended: true}))
+app.set('view engine', 'ejs')
 
 
 MongoClient.connect('mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl', (err, database) => {
-   if (err) return console.log(err)
-    db = database
-  app.listen(port, () => {
-    console.log(`Listening on port ${port}!`)
-  })
+ if (err) return console.log(err)
+  db = database
+app.listen(port, () => {
+  console.log(`Listening on port ${port}!`)
+})
 })
 
 app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/index.html')
+  db.collection('entries').find().toArray((err, result) => {
+    // console.log(results)
+    // res.sendFile(__dirname + '/index.html')
+    res.render('index.ejs', {entries: result})
+  })
 })
+
+app.get('/:name?', (req, res) => {
+  let name = req.params.name
+  db.collection('entries').find({
+    "label": name
+  }).toArray((err, result) => {
+    res.render('index.ejs', {entries: result})
+  })
+})
+
+// app.get('/rewind/:animal', (req, res) => {
+//   const rewinder = [...req.params.animal].reverse().join('')
+//   res.send(rewinder)
+// })
 
 // EXAMPLE - VIEW FORM CONTENTS (object) IN THE REQUEST BODY
 // app.post('/entries', (req, res) => {
@@ -32,10 +51,13 @@ app.get('/', (req, res) => {
 app.post('/entries', (req, res) => {
   db.collection('entries').save(req.body, (err, result) => {
     if (err) return console.log(err)
-    console.log('saved to database')
+      console.log('saved to database')
     res.redirect('/')
   })
 })
+
+
+
 
 // EXAMPLE - REQUEST PARAMETERS
 // app.get('/entry/:name?/:link?', function(req, res){

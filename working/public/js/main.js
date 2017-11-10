@@ -24,19 +24,19 @@ window.addEventListener('scroll', fixNav);
 
 const siteWrap = document.querySelector('.site-wrap');
 window.onload = function () {
-  window.location.hash = '#watchlist'
+  // window.location.hash = '#watchlist'
 }
 
-window.onhashchange = function () {
-  let newloc = window.location.hash;
-  let newContent = navItems.filter(navItem => navItem.link == newloc);
-  siteWrap.innerHTML = `
-  <h1>${newContent[0].label}</h1>
-  <h2>${newContent[0].header}</h2>
-  <p>${newContent[0].content}</p>
-  `;
-  document.body.classList.remove('show')
-}
+// window.onhashchange = function () {
+//   let newloc = window.location.hash;
+//   let newContent = navItems.filter(navItem => navItem.link == newloc);
+//   siteWrap.innerHTML = `
+//   <h1>${newContent[0].label}</h1>
+//   <h2>${newContent[0].header}</h2>
+//   <p>${newContent[0].content}</p>
+//   `;
+//   document.body.classList.remove('show')
+// }
 
 
 const logo = document.querySelector('.logo');
