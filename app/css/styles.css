@@ -77,20 +77,41 @@ nav {
   background: #007eb6;
   width: 100%;
   transition: all 0.5s;
+  position: relative;
   z-index: 1;
+}
+
+.fixed-nav nav {
+  position: fixed;
+  top: 0;
+  box-shadow: 0 5px 3px rgba(0, 0, 0, 0.2);
+  width: 100%;
 }
 
 nav ul {
   list-style: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: none;
   height: 2.5rem;
 }
 
+@media (min-width: 46.25em) {
+  nav ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
 nav li {
+  background: #007eb6;
+  padding: 0.5rem;
   flex: 1;
-  text-align: center;
+}
+
+@media (min-width: 46.25em) {
+  nav li {
+    text-align: center;
+  }
 }
 
 nav a {
@@ -100,9 +121,14 @@ nav a {
 }
 
 .logo {
-  max-width: 0;
-  overflow: hidden;
+  display: block;
   background: white;
+}
+
+@media (min-width: 46.25em) {
+  .logo {
+    display: none;
+  }
 }
 
 .logo img {
@@ -110,15 +136,11 @@ nav a {
   width: 2.5rem;
 }
 
-body.fixed-nav nav {
-  position: fixed;
-  top: 0;
-  box-shadow: 0 5px 3px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  z-index: 1;
-}
-
 body.fixed-nav .site-wrap {
   transform: scale(1);
+}
+
+.showmenu #nav-links {
+  display: block;
 }
 /*# sourceMappingURL=styles.css.map */
