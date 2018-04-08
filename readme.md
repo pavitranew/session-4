@@ -8,56 +8,202 @@ Complete the Express application so that each navigation item works (i.e. displa
 
 Review the package.json. Note the use of a proxy for browser sync and separate mac and pc scripts.
 
-* cd into the `working` directory 
-* npm install all dependencies
+cd into the `working` directory and edit package.json to remove unneeded packages (node-sass, browser-sync, conncurrently) and to run nodemon and babel:
+
+`"boom!": "concurrently \"nodemon app.js\" \"npm run babel\" "`
+
+npm install all dependencies and run:
+
+`npm run boom!`
+
 * review the connection settings in app.js
 * log into / create an account on mLab.com
 * find / create your database and database user
 
-Note the instructions for connecting with the db username and password in the connection URL 
+Note the instructions for connecting with the db username and password in the connection URL, e.g.:
 
 `mongodb://<dbuser>:<dbpassword>@ds139969.mlab.com:39969/bcl`
 
-e.g.:
+My completed string:
 
-`const mongoUrl = 'mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl'` 
+`const mongoUrl = 'mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl'`
 
-(You will replace it with your own later in class.)
+You can download a GUI for Mongo called [Compass](https://www.mongodb.com/download-center#compass) (choose the free Community Edition).
 
+Copy and paste the connection string (e.g. `mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl`) and Compass will automatically create a connection.
+
+Test the form:
+
+```js
+app.post('/entries', (req, res) => {
+  console.log(req.body);
+  res.redirect('/');
+});
 ```
-MongoClient.connect(mongoUrl, (err, database) => {...}
-```
-
-We can also download a GUI for Mongo called Compass at https://www.mongodb.com/download-center#compass
-
-Run `npm run <boom-mac or pc>` or simply `nodemon app.js` (demo - app.use static).
 
 ### Showing entries to users
 
-Review app.js.
+From [session 3](https://github.com/front-end-intermediate/session-3#showing-entries-to-users):
+
+We have to do two things to show the entries stored in MongoLab to our users.
+
+1. Get entries from MongoLab
+2. Use a some form of dynamic html (a template engine) to display the entries
+
+We can get the entries from MongoLab by using the find method available in the collection method:
 
 ```js
 app.get('/', (req, res) => {
-  console.log('hey')
-  db.collection('entries').find().toArray((err, result) => {
-    if (err) return console.log(err)
-    // renders index.ejs
-    // res.render('index.ejs', {entries: result})
-    res.send('it works!')
-  })
-})
+  var cursor = db.collection('entries').find();
+  console.log(cursor);
+  res.sendFile(__dirname + '/index.html');
+});
+```
+
+The find method returns a cursor (A Mongo Object) that probably doesn’t make much sense when you `console.log` it out.
+
+This cursor object contains all entries from our database. It also contains a bunch of other properties and methods that allow us to work with data easily. One such method is the `toArray` method.
+
+The `toArray` method takes in a callback function that allows us to do stuff with entries we retrieved from MongoLab. Let’s try doing a console.log() for the results and see what we get:
+
+```js
+app.get('/', (req, res) => {
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, results) => {
+      console.log(results);
+      res.sendFile(__dirname + '/index.html');
+    });
+});
+```
+
+Refresh the page and see an array of entries in the terminal.
+
+Let's generate HTML that displays all our entries.
+
+## Template Engines
+
+[Template engines](http://expressjs.com/en/guide/using-template-engines.html)
+
+We can’t serve our index.html file and expect entries to magically appear because there’s no way to add dynamic content to a plain HTML file. What we can do instead, is to use template engines to help us out. Some popular template engines include jade/pug, Embedded JavaScript and Nunjucks.
+
+For today, we’re going to use Embedded JavaScript (ejs) as our template engine because it’s easy to start with.
+
+We can use EJS by first installing it, then setting the view engine in Express to ejs.
+
+`$ npm install ejs --save`
+
+and in app.js:
+
+`app.set('view engine', 'ejs')`
+
+Let’s first create an index.ejs file within a views folder so we can start populating data.
+
+```sh
+mkdir views
+touch views/index.ejs
+```
+
+Now, copy the contents of index.html into index.ejs and add.
+
+```html
+<div>
+  <% for(let i=0; i<entries.length; i++) { %>
+    <h2><%= entries[i].label %></h2>
+    <p><%= entries[i].content %></p>
+  <% } %>
+</div>
+```
+
+In EJS, you can write JavaScript within `<%` and `%>` tags.
+
+You can also output JavaScript as strings if you use the `<%=` and `%>` tags.
+
+Here, you can see that we’re basically looping through the entries array and creating strings with `entries[i].label` and `entries[i].content`.
+
+The complete `index.ejs` file so far should be something like:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MY APP</title>
+  <style>
+    input, textarea {
+      display: block;
+      margin: 1rem;
+      width: 70%;
+    }
+  </style>
+</head>
+<body>
+
+  <form action="/entries" method="POST">
+    <input type="text" placeholder="label" name="label">
+    <input type="text" placeholder="header" name="header">
+    <textarea type="text" placeholder="content" name="content"></textarea>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div>
+    <% for(var i=0; i<entries.length; i++) { %>
+    <h2><%= entries[i].label %></h2>
+    <p><%= entries[i].content %></p>
+    <% } %>
+  </div>
+
+</body>
+</html>
+```
+
+Finally, we have to render `index.ejs` when handling the GET request.
+
+Here, we’re setting the results (an array) as the entries array we used in `index.ejs` above.
+
+```js
+app.get('/', (req, res) => {
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      // renders index.ejs
+      res.render('index.ejs', { entries: result });
+    });
+});
+```
+
+Now, refresh your browser and you should be able to see all entries.
+
+```js
+app.get('/', (req, res) => {
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      // renders index.ejs
+      // res.render('index.ejs', {entries: result})
+      res.send('it works!');
+    });
+});
 ```
 
 ```js
 app.get('/', (req, res) => {
-  db.collection('entries').find().toArray((err, result) => {
-    if (err) return console.log(err)
-    // renders index.ejs
-    // res.render('index.ejs', {entries: result})
-    const foo = { name: 'daniel', age: 100, bar: true }
-    res.json(foo)
-  })
-})
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      // renders index.ejs
+      // res.render('index.ejs', {entries: result})
+      const foo = { name: 'daniel', age: 100, bar: true };
+      res.json(foo);
+    });
+});
 ```
 
 Get params from the location string:
@@ -66,13 +212,16 @@ Get params from the location string:
 
 ```js
 app.get('/', (req, res) => {
-  db.collection('entries').find().toArray((err, result) => {
-    if (err) return console.log(err)
-    // renders index.ejs
-    // res.render('index.ejs', {entries: result})
-    res.send(req.query.name)
-  })
-})
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      // renders index.ejs
+      // res.render('index.ejs', {entries: result})
+      res.send(req.query.name);
+    });
+});
 ```
 
 Can also send the query directly to json:
@@ -89,16 +238,16 @@ Which encodes data for us so we can use things like `req.body`.
 
 ```js
 app.get('/rewind/:animal', (req, res) => {
-  res.send('yeah')
+  res.send('yeah');
   // res.send(req.params.animal)
-  })
+});
 ```
 
 ```js
 app.get('/rewind/:animal', (req, res) => {
-  const rewinder = [...req.params.animal].reverse().join('')
-  res.send(rewinder)
-  })
+  const rewinder = [...req.params.animal].reverse().join('');
+  res.send(rewinder);
+});
 ```
 
 You should review some of the [documentation for express](http://expressjs.com/en/api.html#express).
@@ -116,10 +265,10 @@ Edit the primary route:
 
 ```js
 app.get('/', (req, res) => {
-  let cursor = db.collection('entries').find()
-  console.log(cursor)
-  res.sendFile(__dirname + '/index.html')
-})
+  let cursor = db.collection('entries').find();
+  console.log(cursor);
+  res.sendFile(__dirname + '/index.html');
+});
 ```
 
 The find method returns a cursor. You will see it's contents in the terminal if you refresh the page, a complex Mongo Object.
@@ -128,17 +277,19 @@ This cursor object contains all entries from our database. It also contains a [b
 
 The `toArray` method takes a callback function that allows us to perform actions on the entries we retrieved from MongoLab. Try doing a console.log() for the results and see the results in the console:
 
-
 ```js
 app.get('/', (req, res) => {
-  db.collection('entries').find().toArray((err, results) => {
-    console.log(results)
-    res.sendFile(__dirname + '/index.html')
-  })
-})
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, results) => {
+      console.log(results);
+      res.sendFile(__dirname + '/index.html');
+    });
+});
 ```
 
-The array of entries should appear in the terminal on refresh. 
+The array of entries should appear in the terminal on refresh.
 
 Other pertinent methods here include the `.find()` method. It is run against a collection and is just one of a [series of methods](https://docs.mongodb.com/manual/reference/method/js-collection/).
 
@@ -228,15 +379,17 @@ The complete index.ejs file so far should be:
 
 Finally, we have to render this index.ejs file when handling the GET request. Here, we’re setting the results (an array) as the entries array we used in index.ejs above.
 
-
 ```js
 app.get('/', (req, res) => {
-  db.collection('entries').find().toArray((err, result) => {
-    if (err) return console.log(err)
-    // renders index.ejs
-    res.render('index.ejs', {entries: result})
-  })
-})
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      // renders index.ejs
+      res.render('index.ejs', { entries: result });
+    });
+});
 ```
 
 Refresh your browser and you should be able to see all entries.
@@ -246,8 +399,8 @@ Refresh your browser and you should be able to see all entries.
 We need to:
 
 1. check our npm scripts to integrate nodemon and proxy browser-sync
-1. move the old index.html into index.ejs 
-1. re-enable app.use static. 
+1. move the old index.html into index.ejs
+1. re-enable app.use static.
 
 Edit package.json to proxy the browser sync to our express port number and add nodemon to our list of currently running scripts.
 
@@ -323,13 +476,16 @@ Get one entry using parameters:
 
 ```js
 app.get('/:name?', (req, res) => {
-  let name = req.params.name
-  db.collection('entries').find({
-    "label": name
-  }).toArray((err, result) => {
-    res.render('index.ejs', {entries: result})
-  })
-})
+  let name = req.params.name;
+  db
+    .collection('entries')
+    .find({
+      label: name
+    })
+    .toArray((err, result) => {
+      res.render('index.ejs', { entries: result });
+    });
+});
 ```
 
 Try: `http://localhost:3000/watchlist`
@@ -348,12 +504,15 @@ Now, create your own db on mLab and, using your own connection, make the interfa
 
 ```js
 app.get('/', (req, res) => {
-  db.collection('entries').find().toArray((err, result) => {
-    if (err) return console.log(err)
-    // renders index.ejs
-    res.render('index.ejs', {entries: result, nav: ['Watchlist', 'Research', 'Markets']})
-  })
-})
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      // renders index.ejs
+      res.render('index.ejs', { entries: result, nav: ['Watchlist', 'Research', 'Markets'] });
+    });
+});
 ```
 
 ```html
@@ -368,13 +527,16 @@ app.get('/', (req, res) => {
 
 ```js
 app.get('/:name?', (req, res) => {
-  let name = req.params.name
-  db.collection('entries').find({
-    "label": name
-  }).toArray((err, result) => {
-    res.render('index.ejs', {entries: result, nav: ['watchlist', 'research', 'markets']})
-  })
-})
+  let name = req.params.name;
+  db
+    .collection('entries')
+    .find({
+      label: name
+    })
+    .toArray((err, result) => {
+      res.render('index.ejs', { entries: result, nav: ['watchlist', 'research', 'markets'] });
+    });
+});
 ```
 
 ## Angular as a Templating Engine
@@ -391,9 +553,7 @@ HTML5 introduced the `data-` [attribute](https://developer.mozilla.org/en-US/doc
 
 Angular uses this concept to extend html with [directives](https://www.w3schools.com/angular/angular_directives.asp) such as data-ng-app, data-ng-controller, data-ng-repeat
 
-`<html lang="en"  data-ng-app>`
-
-
+`<html lang="en" data-ng-app>`
 
 ### Angular Directives
 
@@ -490,10 +650,10 @@ Create: `test.js`:
 angular.module('myApp', []);
 
 angular.module('myApp').component('greetUser', {
-    template: 'Hello, {{$ctrl.user}}!',
-    controller: function GreetUserController() {
-        this.user = 'world';
-    }
+  template: 'Hello, {{$ctrl.user}}!',
+  controller: function GreetUserController() {
+    this.user = 'world';
+  }
 });
 ```
 
@@ -525,7 +685,7 @@ Create `test.html`:
 
 Declare a named Angular app:
 
-`<html lang="en"  ng-app="myApp">`
+`<html lang="en" ng-app="myApp">`
 
 Place a section of the page under the influence of an Angular controller:
 
@@ -594,7 +754,7 @@ Use Angular to build it out again in index.html:
 </nav>
 ```
 
-`{{  }}` - moustaches or handlebars are similar to JavaScript Template Strings (`${   }`). These are known as [expressions](https://docs.angularjs.org/guide/expression).
+`{{ }}` - moustaches or handlebars are similar to JavaScript Template Strings (`${ }`). These are known as [expressions](https://docs.angularjs.org/guide/expression).
 
 `ng-repeat` is a directive. There are [many directives](https://docs.angularjs.org/api/).
 
@@ -607,7 +767,7 @@ Build out the content:
 </div>
 ```
 
-Note - injecting html into a page is considered unsafe. 
+Note - injecting html into a page is considered unsafe.
 
 Try adding `{{ navItem.content }}`
 
@@ -623,9 +783,6 @@ We can then use:
 
 `<div ng-bind-html="navItem.content"></div>`
 
-
-
-
 ### Notes
 
 https://github.com/expressjs/body-parser#bodyparserurlencodedoptions
@@ -638,7 +795,7 @@ Go to:
 
 `https://api.github.com/users/dannyboynyc`
 
-Your job is to extract your username from your github api and display it on a page using Angular. You need not use Express or npm, a plain html file will do. 
+Your job is to extract your username from your github api and display it on a page using Angular. You need not use Express or npm, a plain html file will do.
 
 Here's some code that should prove helpful:
 
@@ -652,5 +809,4 @@ $http.get('https://api.github.com/users/dannyboynyc')
 .then( onUserComplete )
 ```
 
-`<p>{{ user.name }}</p>` 
-
+`<p>{{ user.name }}</p>`
