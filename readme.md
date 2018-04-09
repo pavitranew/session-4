@@ -28,11 +28,50 @@ My completed string:
 
 `const mongoUrl = 'mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl'`
 
-You can download a GUI for Mongo called [Compass](https://www.mongodb.com/download-center#compass) (choose the free Community Edition).
+You can download a GUI for Mongo called [Compass](https://www.mongodb.com/download-center#compass) (choose the free Community Edition). Copy and paste the connection string (e.g. `mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl`) and Compass will automatically create a connection.
 
-Copy and paste the connection string (e.g. `mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl`) and Compass will automatically create a connection.
+## Mongo Client
 
-Test the form:
+[Documentation](http://mongodb.github.io/node-mongodb-native/)
+
+Testing - create a collection:
+
+```js
+// CONNECT to the database and start the server
+MongoClient.connect(connectString, (err, database) => {
+  if (err) return console.log(err);
+  db = database;
+
+  db.createCollection('testing');
+  // show collections;
+  db.collection('testing').insert({ yuck: 'yuck' });
+
+  app.listen(port, () => {
+    console.log(`Listening on port ${port}!`);
+  });
+});
+```
+
+Testing - inserting and searching a collection:
+
+```js
+// CONNECT to the database and start the server
+MongoClient.connect(connectString, (err, database) => {
+  if (err) return console.log(err);
+  db = database;
+
+  db.createCollection('testing');
+  // show collections;
+  db.collection('testing').insert({ yuck: 'yuck' });
+  const tempC = db.collection('testing').find();
+  console.log(tempC);
+  app.listen(port, () => {
+    console.log(`Listening on port ${port}!`);
+  });
+});
+```
+
+Test the form (POST):
 
 ```js
 app.post('/entries', (req, res) => {
@@ -82,11 +121,45 @@ Refresh the page and see an array of entries in the terminal.
 
 Let's generate HTML that displays all our entries.
 
+## static
+
+app.use(express.static('app'));
+
+Rename `OLD-index.html`
+
+Initialize sass and move the code into styles.scss:
+
+```css
+input, textarea {
+  display: block;
+  margin: 1rem;
+  width: 70%;
+}
+```
+
+Replace all the html, leaving the form in place.
+
+## Integration
+
+```js
+app.get('/#watchlist', function(req, res) {
+  // res.send(`
+  //   <h1>Watchlist</h1>
+  //   <p>Commentary on Watchlists will go here.</p>
+  //   `);
+  db.collection('entries').find({"label": "watchlist"}).toArray((err, results) => {
+    if (err) return console.log(err);
+    console.log('here are ' + results);
+    res.redirect('/#watchlist');
+  })
+});
+```
+
 ## Template Engines
 
 [Template engines](http://expressjs.com/en/guide/using-template-engines.html)
 
-We can’t serve our index.html file and expect entries to magically appear because there’s no way to add dynamic content to a plain HTML file. What we can do instead, is to use template engines to help us out. Some popular template engines include jade/pug, Embedded JavaScript and Nunjucks.
+We can’t serve our index.html file and expect entries to magically appear. What we can do instead, is to use template engines to help us out. Some popular template engines include jade/pug, Embedded JavaScript and Nunjucks.
 
 For today, we’re going to use Embedded JavaScript (ejs) as our template engine because it’s easy to start with.
 
@@ -177,7 +250,7 @@ app.get('/', (req, res) => {
 
 Now, refresh your browser and you should be able to see all entries.
 
-```js
+<!-- ```js
 app.get('/', (req, res) => {
   db
     .collection('entries')
@@ -189,7 +262,7 @@ app.get('/', (req, res) => {
       res.send('it works!');
     });
 });
-```
+``` -->
 
 ```js
 app.get('/', (req, res) => {
@@ -423,17 +496,6 @@ Migrate index.html into index.ejs something like the below:
     <title>EJS Barclays Live</title>
     <link rel="stylesheet" href="/css/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-      input, textarea {
-        display: block;
-        margin: 1rem;
-        width: 70%;
-      }
-      .entry {
-        background: #eee;
-      }
-    </style>
   </head>
   <body>
     <header>
@@ -488,19 +550,13 @@ app.get('/:name?', (req, res) => {
 });
 ```
 
-Try: `http://localhost:3000/watchlist`
+Try: `http://localhost:xxxx/watchlist` where `xxxx` is the current port number.
 
-Edit main.js to remove onload and remove the hashes form markup:
-
-```
-const markup = `${navItems.map(listItem => `<li><a href="${listItem.link}">${listItem.label}</a></li>`).join('')}`;
-
-// window.location.hash = '#watchlist'
-```
+Edit main.js to remove onload scripts and the hash functionality.
 
 Now, create your own db on mLab and, using your own connection, make the interface work with your own content.
 
-### Nav - an blunt approach
+### Dynamic Navbar
 
 ```js
 app.get('/', (req, res) => {
@@ -509,18 +565,18 @@ app.get('/', (req, res) => {
     .find()
     .toArray((err, result) => {
       if (err) return console.log(err);
-      // renders index.ejs
-      res.render('index.ejs', { entries: result, nav: ['Watchlist', 'Research', 'Markets'] });
+      const navigation = result.map(entry => `${entry.label}`)
+      res.render('index.ejs', { entries: result, navigation});
     });
 });
 ```
 
 ```html
 <nav>
-  <% for(var i=0; i<nav.length; i++) { %>
-  <li>
-    <a href="#"><%= nav[i] %></a>
-  </li>
+  <% for(var i=0; i<navigation.length; i++) { %>
+    <li>
+    <a href="<%= navigation[i] %>"><%= navigation[i] %></a>
+    </li>
   <% } %>
 </nav>
 ```
@@ -538,6 +594,79 @@ app.get('/:name?', (req, res) => {
     });
 });
 ```
+
+or:
+
+```js
+const navigation = ['Watchlist', 'Research', 'Markets']
+
+app.get('/', (req, res) => {
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      // renders index.ejs
+      // res.render('index.ejs', { entries: result });
+      res.render('index.ejs', { entries: result, nav: navigation });
+    });
+});
+```
+
+Dynamic generation of the nav:
+
+```js
+app.get('/', (req, res) => {
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      const navigation = result.map(entry => `${entry.label}`)
+      console.log(temp);
+      res.render('index.ejs', { entries: result, nav: navigation });
+    });
+});
+```
+
+or
+
+```js
+app.get('/:name?', (req, res) => {
+  let name = req.params.name;
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      const navigation = result.map(entry => `${entry.label}`)
+      const thisItem = result.filter(result => result.label == name)
+      res.render('index.ejs', { entries: thisItem, navigation});
+    });
+});
+```
+
+and
+
+```js
+<nav>
+  <% for(var i=0; i<navigation.length; i++) { %>
+    <li>
+    <a href="<%= navigation[i] %>"><%= navigation[i] %></a>
+    </li>
+  <% } %>
+</nav>
+```
+
+### Form
+
+Test the form to create of additional entries.
+
+### SASS
+
+Recode the HTML and SCSS files to correct the display.
+
+
 
 ## Angular as a Templating Engine
 
