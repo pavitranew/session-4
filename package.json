@@ -1,10 +1,9 @@
 {
-  "name": "session-2",
+  "name": "session 4",
   "version": "1.0.0",
-  "description": "significanrt change ## Reading",
-  "main": "index.js",
+  "description": "",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "browser-sync start --server \"app\" --files \"app\"",
     "sassy": "node-sass --watch \"scss\"  --output \"app/css/\" --source-map true",
     "babel": "babel app/js/main.js --watch --source-maps --out-file app/js/main-compiled.js",
@@ -12,15 +11,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/front-end-intermediate/session-2.git"
+    "url": "git+https://github.com/front-end-intermediate/session-4.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/front-end-intermediate/session-2/issues"
-  },
-  "homepage": "https://github.com/front-end-intermediate/session-2#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",

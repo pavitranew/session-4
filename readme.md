@@ -2,7 +2,7 @@
 
 ## Homework
 
-Complete the Express application so that each navigation item works (i.e. displays relevant content in the browser)
+tbd
 
 ## Set up and Db Connection
 
