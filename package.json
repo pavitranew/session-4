@@ -1,10 +1,10 @@
 {
-  "name": "session 4",
+  "name": "session-4",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "browser-sync start --server \"app\" --files \"app\"",
+    "start": "browser-sync start --proxy \"localhost:9000\" --server \"app\" --files \"app\"",
     "sassy": "node-sass --watch \"scss\"  --output \"app/css/\" --source-map true",
     "babel": "babel app/js/main.js --watch --source-maps --out-file app/js/main-compiled.js",
     "boom!": "concurrently \"npm run start\" \"npm run babel\" "

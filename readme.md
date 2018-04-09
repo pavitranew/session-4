@@ -4,11 +4,31 @@
 
 tbd
 
-## Set up and Db Connection
+## Review
+
+Babel
+
+Update our installation of Babel to the [latest preset system](https://babeljs.io/docs/plugins/preset-env).
+
+`npm uninstall babel-preset-es2015 --save-dev`
+
+`npm install babel-preset-env --save-dev`
+
+```js
+  "babel": {
+    "presets": [
+      ["env", {
+        "targets": {
+          "browsers": ["last 2 versions", "safari >= 7"]
+        }
+      }]
+    ]
+  },
+```
 
 Review the package.json. Note the use of a proxy for browser sync and separate mac and pc scripts.
 
-cd into the `working` directory and edit package.json to remove unneeded packages (node-sass, browser-sync, conncurrently) and to run nodemon and babel:
+`cd` into the `working` directory and edit package.json to remove unneeded packages (node-sass) and to run nodemon and babel:
 
 `"boom!": "concurrently \"nodemon app.js\" \"npm run babel\" "`
 
@@ -16,7 +36,9 @@ npm install all dependencies and run:
 
 `npm run boom!`
 
-* review the connection settings in app.js
+## Set up and Db Connection
+
+* review the connection settings in `app.js`
 * log into / create an account on mLab.com
 * find / create your database and database user
 
