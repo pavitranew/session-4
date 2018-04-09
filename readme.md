@@ -64,8 +64,8 @@ MongoClient.connect(connectString, (err, database) => {
   if (err) return console.log(err);
   db = database;
 
-  db.createCollection('testing');
-  // show collections;
+  // db.createCollection('testing');
+  // THIS LINE both creates and inserts
   db.collection('testing').insert({ yuck: 'yuck' });
 
   app.listen(port, () => {
@@ -74,7 +74,7 @@ MongoClient.connect(connectString, (err, database) => {
 });
 ```
 
-Testing - inserting and searching a collection:
+### Inserting and searching a collection:
 
 ```js
 // CONNECT to the database and start the server
@@ -82,11 +82,9 @@ MongoClient.connect(connectString, (err, database) => {
   if (err) return console.log(err);
   db = database;
 
-  db.createCollection('testing');
-  // show collections;
   db.collection('testing').insert({ yuck: 'yuck' });
-  const tempC = db.collection('testing').find();
-  console.log(tempC);
+  const tempColl = db.collection('testing').find();
+  console.log(tempColl);
   app.listen(port, () => {
     console.log(`Listening on port ${port}!`);
   });
