@@ -2,7 +2,10 @@
 
 ## Homework
 
-tbd
+* Scan the documentation for [Express](https://expressjs.com)
+* Create your own db on mLab and, using your own connection, make the interface work with your content. 
+* Ensure that the functions we created for our page such as responsive navigation and and the visual formatting remain in the new ejs version.
+* Watch [this video](https://youtu.be/3nl3LFgKZ2o) and implement a wrapper for your ejs template. 
 
 ## Review
 
@@ -52,15 +55,14 @@ If you prefer a desktop GUI for Mongo you can download [Compass](https://www.mon
 
 ## Mongo Client
 
-[The Mongo client's](http://mongodb.github.io/node-mongodb-native/) [documentation](http://mongodb.github.io/node-mongodb-native/3.0/) is worth reading in conjunction with some fo the code we wrote in the previous session.
+[The Mongo client's](http://mongodb.github.io/node-mongodb-native/) [documentation](http://mongodb.github.io/node-mongodb-native/3.0/) is worth reading in conjunction with some of the code we wrote in the previous session.
 
 [Here](http://mongodb.github.io/node-mongodb-native/3.0/reference/ecmascriptnext/connecting/) is the method for connecting and [creating a collection](http://mongodb.github.io/node-mongodb-native/3.0/tutorials/collections/).
 
-### Testing - create a collection:
+### Create and Insert into a collection
 
 ```js
-// CONNECT to the database and start the server
-MongoClient.connect(connectString, (err, database) => {
+MongoClient.connect(mongoUrl, (err, database) => {
   if (err) return console.log(err);
   db = database;
 
@@ -74,13 +76,14 @@ MongoClient.connect(connectString, (err, database) => {
 });
 ```
 
-### Inserting and searching a collection:
+### Searching a collection
+
+Documentation on the methods for manipulating your database (including read methods such as `find()`) are [here](http://mongodb.github.io/node-mongodb-native/3.0/tutorials/crud/#read-methods)
 
 ```js
-// CONNECT to the database and start the server
-MongoClient.connect(connectString, (err, database) => {
+MongoClient.connect(mongoUrl, (err, database) => {
   if (err) return console.log(err);
-  db = database;
+  const db = database;
 
   db.collection('testing').insert({ yuck: 'yuck' });
   const tempColl = db.collection('testing').find();
@@ -91,7 +94,27 @@ MongoClient.connect(connectString, (err, database) => {
 });
 ```
 
-Test the form (POST):
+Since `find()` returns a largely unintelligable cursor, in most cases you want to run additional operations such as the `toArray()` below:
+
+```js
+MongoClient.connect(mongoUrl, (err, database) => {
+  if (err) return console.log(err);
+  const db = database;
+
+  db.collection('testing').insert({ yuck: 'yuck' });
+  const tempColl = db.collection('testing').find().toArray((err, hooha) => {
+    console.log(hooha)
+  });
+  console.log(tempColl);
+  app.listen(port, () => {
+    console.log(`Listening on port ${port}!`);
+  });
+});
+```
+
+Remove the testing code from our initialization script.
+
+Test the form (POST) by temporarily commenting out the current post handler and substituting:
 
 ```js
 app.post('/entries', (req, res) => {
@@ -109,7 +132,7 @@ We have to do two things to show the entries stored in MongoLab to our users.
 1. Get entries from MongoLab
 2. Use a some form of dynamic html (a template engine) to display the entries
 
-We can get the entries from MongoLab by using the find method available in the collection method:
+We get the entries from MongoLab by using the find method available in the collection method:
 
 ```js
 app.get('/', (req, res) => {
@@ -143,9 +166,13 @@ Let's generate HTML that displays all our entries.
 
 ## static
 
-app.use(express.static('app'));
+Uncomment
 
-Rename `OLD-index.html`
+`app.use(express.static('app'));`
+
+Rename app/index.html to 
+
+`OLD-index.html`
 
 Initialize sass and move the code into styles.scss:
 
@@ -157,9 +184,11 @@ input, textarea {
 }
 ```
 
-Replace all the html, leaving the form in place.
+Replace all the html in `./index.html` with the html in `./app/index.html` leaving the form in place.
 
 ## Integration
+
+Let's try to implement one of our routes.
 
 ```js
 app.get('/#watchlist', function(req, res) {
@@ -169,11 +198,14 @@ app.get('/#watchlist', function(req, res) {
   //   `);
   db.collection('entries').find({"label": "watchlist"}).toArray((err, results) => {
     if (err) return console.log(err);
-    console.log('here are ' + results);
+    // console.log('here are ' + results);
+    console.log('There are ' + results[0].label);
     res.redirect('/#watchlist');
   })
 });
 ```
+
+Communication with our html is going to be difficult.
 
 ## Template Engines
 
@@ -222,16 +254,31 @@ The complete `index.ejs` file so far should be something like:
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MY APP</title>
-  <style>
-    input, textarea {
-      display: block;
-      margin: 1rem;
-      width: 70%;
-    }
-  </style>
+  <title>Session 4</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+
+  <header>
+    <h1>Now on the app store!</h1>
+  </header>
+
+  <nav id="main">
+      <a class="logo" href="#0"><img src="img/logo.svg" /></a>
+    <ul id="nav-links"></ul>
+  </nav>
+
+  <div>
+  <% for(let i=0; i<entries.length; i++) { %>
+    <h2><%= entries[i].label %></h2>
+    <p><%= entries[i].content %></p>
+  <% } %>
+  </div>
+
+  <div class="site-wrap">
+
+  </div>
 
   <form action="/entries" method="POST">
     <input type="text" placeholder="label" name="label">
@@ -240,12 +287,8 @@ The complete `index.ejs` file so far should be something like:
     <button type="submit">Submit</button>
   </form>
 
-  <div>
-    <% for(var i=0; i<entries.length; i++) { %>
-    <h2><%= entries[i].label %></h2>
-    <p><%= entries[i].content %></p>
-    <% } %>
-  </div>
+  <script src="js/navitems.js"></script>
+  <script src="js/main-compiled.js"></script>
 
 </body>
 </html>
@@ -270,19 +313,7 @@ app.get('/', (req, res) => {
 
 Now, refresh your browser and you should be able to see all entries.
 
-<!-- ```js
-app.get('/', (req, res) => {
-  db
-    .collection('entries')
-    .find()
-    .toArray((err, result) => {
-      if (err) return console.log(err);
-      // renders index.ejs
-      // res.render('index.ejs', {entries: result})
-      res.send('it works!');
-    });
-});
-``` -->
+<!-- =================
 
 ```js
 app.get('/', (req, res) => {
@@ -301,7 +332,7 @@ app.get('/', (req, res) => {
 
 Get params from the location string:
 
-`http://localhost:9001/?name=daniel&foo=true`
+`http://localhost:9000/?name=daniel&foo=true`
 
 ```js
 app.get('/', (req, res) => {
@@ -345,7 +376,9 @@ app.get('/rewind/:animal', (req, res) => {
 
 You should review some of the [documentation for express](http://expressjs.com/en/api.html#express).
 
-### Showing Entries
+============================== -->
+
+<!-- ### Showing Entries
 
 To show the entries stored in MongoLab:
 
@@ -552,7 +585,7 @@ Change the name of index.html to something else.
 
 Enable use.static in app.js, rename /public/index.html (otherwise express will serve it instead of index.ejs), halt nodemon, and run:
 
-`npm run <script>`
+`npm run <script>` -->
 
 Get one entry using parameters:
 
@@ -574,9 +607,9 @@ Try: `http://localhost:xxxx/watchlist` where `xxxx` is the current port number.
 
 Edit main.js to remove onload scripts and the hash functionality.
 
-Now, create your own db on mLab and, using your own connection, make the interface work with your own content.
-
 ### Dynamic Navbar
+
+Create a variable navigation comprised of the labels and send to the ejs via the render method:
 
 ```js
 app.get('/', (req, res) => {
@@ -591,6 +624,8 @@ app.get('/', (req, res) => {
 });
 ```
 
+Remove the current navbar code in the html and use ejs:
+
 ```html
 <nav>
   <% for(var i=0; i<navigation.length; i++) { %>
@@ -601,6 +636,10 @@ app.get('/', (req, res) => {
 </nav>
 ```
 
+### Parameterized Routes
+
+We can also pass a hard coded navigation array. Let's try that for our parameterized route:
+
 ```js
 app.get('/:name?', (req, res) => {
   let name = req.params.name;
@@ -610,7 +649,7 @@ app.get('/:name?', (req, res) => {
       label: name
     })
     .toArray((err, result) => {
-      res.render('index.ejs', { entries: result, nav: ['watchlist', 'research', 'markets'] });
+      res.render('index.ejs', { entries: result, navigation: ['watchlist', 'research', 'markets'] });
     });
 });
 ```
@@ -633,7 +672,7 @@ app.get('/', (req, res) => {
 });
 ```
 
-Dynamic generation of the nav:
+<!-- Dynamic generation of the nav:
 
 ```js
 app.get('/', (req, res) => {
@@ -647,9 +686,11 @@ app.get('/', (req, res) => {
       res.render('index.ejs', { entries: result, nav: navigation });
     });
 });
-```
+``` -->
 
-or
+Obviously a hard coded navigation is impractical. 
+
+Let's use `array.map()` to develop the navigation list and `array.filter()` to isolate the item we want to display on parameterized routes.
 
 ```js
 app.get('/:name?', (req, res) => {
@@ -685,6 +726,8 @@ Test the form to create of additional entries.
 ### SASS
 
 Recode the HTML and SCSS files to correct the display.
+
+Create your own db on mLab and, using your own connection, make the interface work with your content. Ensure that the functions we created for our page such as responsive navigation and and the visual formatting remain in the new ejs version.
 
 
 
