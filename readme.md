@@ -26,8 +26,6 @@ Update our installation of Babel to the [latest preset system](https://babeljs.i
   },
 ```
 
-Review the package.json. Note the use of a proxy for browser sync and separate mac and pc scripts.
-
 `cd` into the `working` directory and edit package.json to remove unneeded packages (node-sass) and to run nodemon and babel:
 
 `"boom!": "concurrently \"nodemon app.js\" \"npm run babel\" "`
@@ -44,19 +42,21 @@ npm install all dependencies and run:
 
 Note the instructions for connecting with the db username and password in the connection URL, e.g.:
 
-`mongodb://<dbuser>:<dbpassword>@ds139969.mlab.com:39969/bcl`
+`mongodb://<db username>:<db password>@<subdomain>.mlab.com:<port number>/<db name>`
 
 My completed string:
 
 `const mongoUrl = 'mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl'`
 
-You can download a GUI for Mongo called [Compass](https://www.mongodb.com/download-center#compass) (choose the free Community Edition). Copy and paste the connection string (e.g. `mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl`) and Compass will automatically create a connection.
+If you prefer a desktop GUI for Mongo you can download [Compass](https://www.mongodb.com/download-center#compass) (choose the free Community Edition). Copy and paste the connection string (e.g. `mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl`) and Compass will automatically create a connection for it.
 
 ## Mongo Client
 
-[Documentation](http://mongodb.github.io/node-mongodb-native/)
+[The Mongo client's](http://mongodb.github.io/node-mongodb-native/) [documentation](http://mongodb.github.io/node-mongodb-native/3.0/) is worth reading in conjunction with some fo the code we wrote in the previous session.
 
-Testing - create a collection:
+[Here](http://mongodb.github.io/node-mongodb-native/3.0/reference/ecmascriptnext/connecting/) is the method for connecting and [creating a collection](http://mongodb.github.io/node-mongodb-native/3.0/tutorials/collections/).
+
+### Testing - create a collection:
 
 ```js
 // CONNECT to the database and start the server
