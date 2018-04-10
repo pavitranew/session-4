@@ -2,3 +2,9 @@
 @import 'imports/main';
 @import 'imports/header';
 @import 'imports/nav';
+
+input, textarea {
+  display: block;
+  margin: 1rem;
+  width: 70%;
+} 

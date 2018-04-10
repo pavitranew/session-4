@@ -1,15 +1,16 @@
-
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const port = 9000;
 app.use(bodyParser.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
+app.use(express.static('app'));
 
-// app.use(express.static('app'));
 
-MongoClient.connect('mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl', (err, database) => {
+const mongoUrl = 'mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl';
+
+MongoClient.connect(mongoUrl, (err, database) => {
   if (err) return console.log(err);
   db = database;
   app.listen(port, () => {
@@ -18,7 +19,14 @@ MongoClient.connect('mongodb://dannyboynyc:dd2345@ds139969.mlab.com:39969/bcl', 
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html')
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      const navigation = result.map((entry) => `${entry.label}`)
+      res.render('index.ejs', { entries: result, navigation});
+    });
 });
 
 app.post('/entries', (req, res) => {
@@ -29,32 +37,15 @@ app.post('/entries', (req, res) => {
   });
 });
 
-app.get('/watchlist', function(req, res) {  // our second route
-  res.send(`
-    <h1>Watchlist</h1>
-    <p>Commentary on Watchlists will go here.</p>
-    `);
-});
-
-app.get('/entry/:name', function(req, res) {
+app.get('/:name?', (req, res) => {
   let name = req.params.name;
-  res.send(`
-    <h1>${name}</h1>
-    <p>Commentary on ${name} will go here.</p>
-    `);
+  db
+    .collection('entries')
+    .find()
+    .toArray((err, result) => {
+      if (err) return console.log(err);
+      const navigation = result.map(entry => `${entry.label}`)
+      const thisItem = result.filter(result => result.label == name)
+      res.render('index.ejs', { entries: thisItem, navigation});
+    });
 });
-
-app.get('/entry/:name?/:link', function(req, res) {
-  let name = req.params.name;
-  let link = `${req.params.link}`;
-  res.send(`
-    <h1>${name}</h1>
-    <p>Commentary on ${name} will go here.</p>
-    <p>${link}</p>
-    `);
-});
-
-
-// app.listen(port, function() {
-//   console.log(`Listening on port ${port}!`);
-// });

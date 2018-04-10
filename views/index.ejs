@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Session 3</title>
+  <title>EJS PAGE</title>
   <link rel="stylesheet" href="css/styles.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -12,24 +12,44 @@
     <h1>Now on the app store!</h1>
   </header>
 
-  <nav id="main">
+  <!-- <nav id="main">
       <a class="logo" href="#0"><img src="img/logo.svg" /></a>
     <ul id="nav-links"></ul>
-  </nav>
+  </nav> -->
+
+  <nav id="main">
+  <a class="logo" href="#0"><img src="img/logo.svg" /></a>
+  <ul id="nav-links">
+  <% for(var i=0; i<navigation.length; i++) { %>
+    <li>
+    <a href="<%= navigation[i] %>"><%= navigation[i] %></a>
+    </li>
+  <% } %>
+  </ul>
+</nav>
+
+
 
   <div class="site-wrap">
-
+  <div>
+  <% for(let i=0; i<entries.length; i++) { %>
+    <h2><%= entries[i].label %></h2>
+    <p><%= entries[i].content %></p>
+  <% } %>
+</div>
   </div>
 
+  <div class="site-wrap">
   <form action="/entries" method="POST">
     <input type="text" placeholder="label" name="label">
     <input type="text" placeholder="header" name="header">
     <textarea type="text" placeholder="content" name="content"></textarea>
     <button type="submit">Submit</button>
   </form>
+  </div>
 
-  <script src="js/navitems.js"></script>
-  <script src="js/main-compiled.js"></script>
+ <!--  <script src="js/navitems.js"></script>
+  <script src="js/main-compiled.js"></script> -->
 
 </body>
 </html>

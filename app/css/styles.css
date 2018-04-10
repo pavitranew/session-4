@@ -143,4 +143,10 @@ body.fixed-nav .site-wrap {
 .showmenu #nav-links {
   display: block;
 }
+
+input, textarea {
+  display: block;
+  margin: 1rem;
+  width: 70%;
+}
 /*# sourceMappingURL=styles.css.map */

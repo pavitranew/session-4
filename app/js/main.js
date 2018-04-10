@@ -28,32 +28,32 @@ function fixNav() {
 // NEW Hashes
 const siteWrap = document.querySelector('.site-wrap');
 
-window.onload = function(){
-  let newContent;
-  if(!window.location.hash){
-    newContent = navItems.filter(
-      navItem => navItem.link == '#watchlist'
-    )
-  } else {
-    newContent = navItems.filter(
-      navItem => navItem.link == window.location.hash
-    )
-  }
-  renderPage(newContent)
-}
+// window.onload = function(){
+//   let newContent;
+//   if(!window.location.hash){
+//     newContent = navItems.filter(
+//       navItem => navItem.link == '#watchlist'
+//     )
+//   } else {
+//     newContent = navItems.filter(
+//       navItem => navItem.link == window.location.hash
+//     )
+//   }
+//   renderPage(newContent)
+// }
 
-window.onhashchange = function() {
-  let newloc = window.location.hash;
-  let newContent = navItems.filter(
-    navItem => navItem.link == newloc
-  )
-  renderPage(newContent);
-  window.scrollTo(0,0);
-}
+// window.onhashchange = function() {
+//   let newloc = window.location.hash;
+//   let newContent = navItems.filter(
+//     navItem => navItem.link == newloc
+//   )
+//   renderPage(newContent);
+//   window.scrollTo(0,0);
+// }
 
-function renderPage(newContent){
-  siteWrap.innerHTML = `
-  <h2>${newContent[0].header}</h2>
-  ${newContent[0].content}
-  `
-}
+// function renderPage(newContent){
+//   siteWrap.innerHTML = `
+//   <h2>${newContent[0].header}</h2>
+//   ${newContent[0].content}
+//   `
+// }
