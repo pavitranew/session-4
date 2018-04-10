@@ -730,7 +730,7 @@ Recode the HTML and SCSS files to correct the display.
 Create your own db on mLab and, using your own connection, make the interface work with your content. Ensure that the functions we created for our page such as responsive navigation and and the visual formatting remain in the new ejs version.
 
 
-
+<!-- 
 ## Angular as a Templating Engine
 
 Let's look at using an older (but still quite common and actively maintained) version of Angular as our page templating language.
@@ -973,17 +973,9 @@ Use [injection](https://docs.angularjs.org/guide/di) to make it available to the
 
 We can then use:
 
-`<div ng-bind-html="navItem.content"></div>`
+`<div ng-bind-html="navItem.content"></div>` -->
 
 ### Notes
-
-https://github.com/expressjs/body-parser#bodyparserurlencodedoptions
-
-http://mongoosejs.com/docs/
-
-Homework
-
-Go to:
 
 `https://api.github.com/users/dannyboynyc`
 
